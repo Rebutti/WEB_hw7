@@ -1,15 +1,21 @@
 import socket
+import sys
 
 def main():
     host = socket.gethostname()
-    port = 5000
+    port = 8000
 
-    server_socket = socket.socket()
+    try:
+        server_socket = socket.socket()
+    except OSError:
+        print('couldn`t open socket')
+        sys.exit(1)
     server_socket.bind((host, port))
-    server_socket.listen(2)
+    print('server started')
+    server_socket.listen(3)
     conn, address = server_socket.accept()
     print(f'Connection from {address}')
-    try:
+    with conn:
         while True:
             data = conn.recv(1024).decode()
             if not data:
@@ -17,11 +23,6 @@ def main():
             print(f"recieved message: {data}")
             message = input("-->")
             conn.send(message.encode())
-    except OSError:
-        print(f'An operation was attempted on something that is not a socket')
-    finally:
-        conn.close()
-
 
 if __name__ == "__main__":
     main()
